@@ -1,36 +1,63 @@
-import { Ingredient } from './../shared/ingredient.module';
-import { Recipe } from "./recipe.model";
-import { EventEmitter, Injectable } from "@angular/core";
+import { Injectable } from '@angular/core';
+import { Subject } from 'rxjs/Subject';
+
+import { Recipe } from './recipe.model';
+import { Ingredient } from '../shared/ingredient.model';
 import { ShoppingListService } from '../shopping-list/shopping-list.service';
 
 @Injectable()
 export class RecipeService {
+  recipesChanged = new Subject<Recipe[]>();
 
-    constructor(private shoppingListService: ShoppingListService){
-        
-    }
+  private recipes: Recipe[] = [
+    new Recipe(
+      'Tasty Schnitzel',
+      'A super-tasty Schnitzel - just awesome!',
+      'https://upload.wikimedia.org/wikipedia/commons/7/72/Schnitzel.JPG',
+      [
+        new Ingredient('Meat', 1),
+        new Ingredient('French Fries', 20)
+      ]),
+    new Recipe('Big Fat Burger',
+      'What else you need to say?',
+      'https://upload.wikimedia.org/wikipedia/commons/b/be/Burger_King_Angus_Bacon_%26_Cheese_Steak_Burger.jpg',
+      [
+        new Ingredient('Buns', 2),
+        new Ingredient('Meat', 1)
+      ])
+  ];
 
-    //recipeSelected = new EventEmitter<Recipe>();
+  constructor(private slService: ShoppingListService) {}
 
-    private recipes: Recipe[] = [
-        new Recipe('Pizza recipe', 'Simple pizza', 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Supreme_pizza.jpg/800px-Supreme_pizza.jpg',
-        [new Ingredient('meat', 1), new Ingredient('eggs', 20)]
-    ),
-        new Recipe('Pasta recipe', 'Simple pasta', 'https://kak-vkusno.com/content/catalog/recepti/vtorie_blyuda/pasta_lazanya_makaroni/kak_prigotovit_italyanskuyu_pastu_%C2%ABkarbonara%C2%BB/thumb_350_270_c_pasta-karbonara.Jpeg', 
-        [new Ingredient('banana', 3), new Ingredient('yougurt', 2)])
-      ];
-    
-    getRecipes() {
-        return this.recipes.slice();
-    }
+  setRecipes(recipes: Recipe[]) {
+    this.recipes = recipes;
+    this.recipesChanged.next(this.recipes.slice());
+  }
 
-    addIngredients(ingredients: Ingredient[]) {
-        console.log('ingredients', ingredients);
-        this.shoppingListService.addIngredients(ingredients);
-    }
+  getRecipes() {
+    return this.recipes.slice();
+  }
 
-    getRecipeById(id: number) {
-        return this.recipes[id];
-    } 
+  getRecipe(index: number) {
+    return this.recipes[index];
+  }
 
+  addIngredientsToShoppingList(ingredients: Ingredient[]) {
+    this.slService.addIngredients(ingredients);
+  }
+
+  addRecipe(recipe: Recipe) {
+    this.recipes.push(recipe);
+    this.recipesChanged.next(this.recipes.slice());
+  }
+
+  updateRecipe(index: number, newRecipe: Recipe) {
+    this.recipes[index] = newRecipe;
+    this.recipesChanged.next(this.recipes.slice());
+  }
+
+  deleteRecipe(index: number) {
+    this.recipes.splice(index, 1);
+    this.recipesChanged.next(this.recipes.slice());
+  }
 }
