@@ -44,14 +44,12 @@ export class DataStorageService {
     this.httpClient.get<Recipe[]>('https://dreamapp-16e31.firebaseio.com/recipes.json?auth=' + token, {observe: 'body', responseType: 'json'})
       .map(
         (recipes) => {
-          console.log(recipes);
-          // for (let recipe of recipes) {
-          //   if (!recipe['ingredients']) {
-          //     recipe['ingredients'] = [];
-          //   }
-          //}
-          //return recipes;
-          return [];
+          for (let recipe of recipes) {
+            if (!recipe['ingredients']) {
+              recipe['ingredients'] = [];
+            }
+          }
+          return recipes;
         }
       )
       .subscribe(

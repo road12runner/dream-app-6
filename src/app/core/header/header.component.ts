@@ -11,6 +11,7 @@ import { AuthService } from '../../auth/auth.service';
 import { Store } from '@ngrx/store';
 
 import * as authActions from '../../auth/store/auth-actions';
+import * as recipeAction from  '../../recipes/store/recipe.actions';
 
 @Component({
   selector: 'app-header',
@@ -31,16 +32,18 @@ export class HeaderComponent implements OnInit{
     this.authState = this.store.select('auth')
   }
   onSaveData() {
-    this.dataStorageService.storeRecipes()
-      .subscribe(
-        (response) => {
-          console.log(response);
-        }
-      );
+    this.store.dispatch(new recipeAction.StoreRecipe());
+    // this.dataStorageService.storeRecipes()
+    //   .subscribe(
+    //     (response) => {
+    //       console.log(response);
+    //     }
+    //   );
   }
 
   onFetchData() {
-    this.dataStorageService.getRecipes();
+    //this.dataStorageService.getRecipes();
+    this.store.dispatch(new recipeAction.FetchRecipe());
   }
 
   onLogout() {
